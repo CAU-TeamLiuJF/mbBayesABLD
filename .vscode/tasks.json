@@ -1,0 +1,81 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cppbuild",
+			"label": "static",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-ggdb",
+				"${workspaceFolder}/src/*.c",
+				"-o",
+				"${workspaceFolder}/build/debug",
+				"-DMKL_ILP64",
+				"-m64",
+				"-I${MKLROOT}/include",
+				"-Wall",
+				"-std=gnu99",
+				"-I${workspaceFolder}/include",
+				"-Wl,--start-group",
+				"${MKLROOT}/lib/intel64/libmkl_intel_ilp64.a",
+				"${MKLROOT}/lib/intel64/libmkl_gnu_thread.a",
+				"${MKLROOT}/lib/intel64/libmkl_core.a",
+				"${MKLROOT}/lib/intel64/libmkl_blacs_openmpi_ilp64.a",
+				"-Wl,--end-group",
+				"-lgomp",
+				"-lpthread",
+				"-lm",
+				"-ldl",
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"showReuseMessage": false
+			},
+			"problemMatcher": "$gcc",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+		{
+			"type": "cppbuild",
+			"label": "build",
+			"command": "/usr/bin/gcc",
+			"args": [
+				"-fdiagnostics-color=always",
+				"-ggdb",
+				"${workspaceFolder}/src/*.c",
+				"-Wall",
+				"-std=gnu99",
+				"-lm",
+				"-I${workspaceFolder}/include",
+				"-I${MKLROOT}/include",
+				// "-DMKL_ILP64",
+				// "-L${MKLROOT}/lib/intel64",
+				// "-lmkl_sycl",
+				// "-lmkl_intel_ilp64",
+				// "-lmkl_tbb_thread",
+				// "-lmkl_core -lsycl",
+				// "-lOpenCL",
+				// "-ltbb",
+				"-lpthread",
+				// "-ldl",
+				"-lmkl_rt",
+				"-o",
+				"${workspaceFolder}/build/Debug/debug"
+			],
+			"presentation": {
+				"echo": true,
+				"reveal": "silent",
+				"showReuseMessage": false
+			},
+			"problemMatcher": "$gcc",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
+		},
+	]
+}

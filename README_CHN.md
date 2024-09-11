@@ -93,3 +93,6 @@ liwn@cau.edu.cn
 #### （4）示例代码
 
 BayesAS --rawf test.raw --phef test.txt --nsnp 100
+
+**注：**
+该软件仅用于复现题为《_Enhancing Multi-Breed Genomic Prediction for Small-Scale Breeds by Modeling Heterogeneous Genetic (Co)Variance Blockwise Accounting for Linkage Disequilibrium_》”的文章中的结果。未经事先许可，严禁将本软件用于任何其他用途，包括商业或非研究应用程序。如有疑问或许可请求，请通过以下方式联系作者：liujf@cau.edu.cn.

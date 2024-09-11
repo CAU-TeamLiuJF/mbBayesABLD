@@ -86,3 +86,6 @@ See parameter descriptions above for details.
 ```
 BayesAS --bfile genotype --phef test.txt --nsnp 100
 ```
+
+**Note:**
+This software is made available solely for the purpose of reproducing the results presented in the scientific article titled _Enhancing Multi-Breed Genomic Prediction for Small-Scale Breeds by Modeling Heterogeneous Genetic (Co)Variance Blockwise Accounting for Linkage Disequilibrium_. Any other use of this software, including commercial or non-research applications, is strictly prohibited without prior permission. For inquiries or permission requests, please contact the author at: liujf@cau.edu.cn.

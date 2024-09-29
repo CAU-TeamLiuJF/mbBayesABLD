@@ -3,6 +3,26 @@
  * @LastEditTime: 2024-09-26 13:36
  * @FilePath: \mbBayesABLD\Readme.md
 -->
+
+[User Manual](#user-manual)
+
+- [1. Software Introduction](#1-software-introduction)
+- [2. Installation Instructions](#2-installation-instructions)
+- [3. Quick Start](#3-quick-start)
+  - [3.1 Installation](#31-installation)
+  - [3.2 Running the Software](#32-running-the-software)
+  - [3.3 Parameters of the Software](#33-parameters-of-the-software)
+- [4. File Description](#4-file-description)
+  - [4.2 Input Files](#42-input-files)
+  - [4.2.1 Phenotype File](#421-phenotype-file)
+  - [4.2.2 Genotype File](#422-genotype-file)
+  - [4.2.3 Marker Chromosome and Physical Location File](#423-marker-chromosome-and-physical-location-file)
+  - [4.2.4 Genomic Block Partitioning File](#424-genomic-block-partitioning-file)
+  - [4.2.5 Variance Component Prior File](#425-variance-component-prior-file)
+- [5. Example Code](#5-example-code)
+  - [5.1 Running with Phenotype and Genotype Files](#51-running-with-phenotype-and-genotype-files)
+  - [5.2 Running with a Specified Block Partition File](#52-running-with-a-specified-block-partition-file)
+
 # mbBayesABLD: Multi-Breed Genomic Prediction Bayesian Model
 
 User Manual for Multi-Breed Joint Prediction Models that Accounting for Heterogeneous Genetic (Co)variance Software V1.0

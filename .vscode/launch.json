@@ -273,6 +273,39 @@
       "preLaunchTask": "build",
     },
     {
+      "name": "example",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/debug",
+      "args": [
+        "--bfile",
+        "/public/home/liujf/liwn/download/mbBayesABLD-main/example/genotype",
+        "--phef",
+        "/public/home/liujf/liwn/download/mbBayesABLD-main/example/phenotype.txt",
+        // "--binf",
+        // "/public/home/liujf/liwn/code/GitHub/data/tianhe/cubic_M_50.txt",
+        // "--outdir",
+        // "/public/home/liujf/liwn/code/GitHub/data/tianhe",
+        // "--fix",
+        // "3 2",
+        // "--seed",
+        // "8031",
+      ],
+      "stopAtEntry": false,
+      "cwd": "/public/home/liujf/liwn/code/GitHub/data",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ],
+      "preLaunchTask": "static",
+    },
+    {
       "name": "r2_mean",
       "type": "cppdbg",
       "request": "launch",

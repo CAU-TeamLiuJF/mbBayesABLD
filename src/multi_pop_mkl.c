@@ -183,11 +183,11 @@ static error_t parse_opt(int key, char* arg, struct argp_state* state)
 /* Parameter description */
 static struct argp_option options[] = {
     {0, 0, 0, 0, "Required parameters:", 1},
-    {"raw", 'g', "FILE", 0, "plink raw file, e.g. /path/plink.raw"},
     {"bfile", 'l', "FILE", 0, "plink binary file prefix, e.g. /path/plink"},
-    {0, 0, 0, 0, "Optional parameters:", 2},
-    {"thread", 'T', "INT", 0, "number of threads for the OpenMP run-time library [1]"},
     {"phef", 'p', "FILE", 0, "phenotype file"},
+    {0, 0, 0, 0, "Optional parameters:", 2},
+    {"raw", 'g', "FILE", 0, "plink raw file, e.g. /path/plink.raw"},
+    {"thread", 'T', "INT", 0, "number of threads for the OpenMP run-time library [1]"},
     {"phe", 'y', "CHR", 0, "phenotypes position, e.g. '4 5' [last npop column(s)]"},
     {"fix", 'F', "CHR", 0, "fixed effect position, e.g. '2 3' [NULL]"},
     {"ran", 'R', "CHR", 0, "environmental random effect position [NULL]"},
@@ -237,9 +237,11 @@ int main(int argc, char* argv[])
   ctime_r(&t, time_buf);
 
   /* ----------- Structures that store variables of different types ----------- */
-  struct Model model = {.df_va = 4.0, .df_ve = 4.0, .h2 = 0.5, .rg = 0.0, .nfix = 0, .nRan = 0};
-
-  Bin bin = {.min = 100, .nsnp = 100, .win = 50, .type = "LD", .thresh = 0.2};
+  Bin bin = {.min = 100,
+            .nsnp = 100,
+            .win = 50,
+            .type = "fix",
+            .thresh = 0.2};
 
   struct Output out;
   struct Pheno phe = {
@@ -255,6 +257,14 @@ int main(int argc, char* argv[])
                           .Ma.center = 1,  // Center the gene content matrix
                           .mapf = "",      // Map file of marker loci; required when partitioning binf file is not provided
                           .Mq.format = 0};
+
+  struct Model model = {.df_va = 4.0,
+                        .df_ve = 4.0,
+                        .h2 = 0.5,
+                        .rg = 0.0,
+                        .nfix = 0,
+                        .nRan = 0,
+                        .geno = &geno};
 
   struct arguments para = {.raw = "",     // Genotype file in PLINK raw format
                            .prefix = "",  // Prefix of PLINK binary genotype files (fam/bim/bed)
@@ -278,7 +288,7 @@ int main(int argc, char* argv[])
                            .varf = "",    // Prior variance components; each line represents a component; the last line is residual variance
                            .prioSa = "",  // Distribution of prior variance for additive effects; can be wishart/gamma
                            .prioSe = "",  // Distribution of prior variance for residual effects; can be wishart
-                           .require_para = 1,  // Number of required parameters
+                           .require_para = 2,  // Number of required parameters
                            .constrain = 0,     // Constraint on residual covariance
                            .maf = -0.01,       // Allowed minimum allele frequency
                            .geno = 0.99,       // Allowed missing rate for a SNP
@@ -316,7 +326,7 @@ int main(int argc, char* argv[])
   }
 
   /* time report */
-  printf("Program MB-BayesAS\n");
+  printf("Program mbBayesABLD\n");
   printf("Run started at %s", time_buf);
   fflush(stdout);
 
@@ -339,6 +349,9 @@ int main(int argc, char* argv[])
   fflush(stdout);
   plink_parse(para.raw, para.prefix, &geno);
   // output_d2i_dataframe(geno.Ma.M, geno.Ma.nind, geno.Ma.nmrk, "genoMa.txt");
+
+  /* Check if individuals in genotype files are sorted according to breed identifiers */
+  fid_order(&geno.Ma);
 
   /* read phenotypes */
   model.npop = geno.Ma.npop;
@@ -377,6 +390,8 @@ int main(int argc, char* argv[])
   }
   else {
     make_bins(&geno, &geno.Mq, &bin);
+    model.nsnps = bin.nsnps;
+    model.nbin = bin.nbin;
   }
 
   /* Check that the sum of all bins markers is equal to the number of markers in the genotype file */

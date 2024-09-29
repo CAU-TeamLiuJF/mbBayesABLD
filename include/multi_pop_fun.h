@@ -105,6 +105,7 @@ struct Model
   double *X1pX1;  /* \sum{2pq} */
   int ld;         /* leading dimension of y and yc */
   int inc;        /* increment of value in y and yc */
+  struct Genotype *geno;   /* Structure for storing genotype parameters */
 
   // double *randn;   // debug 2
   // int randidx;     // debug 2
@@ -319,10 +320,11 @@ void obs_type(int npop, int *ninds, double *y, double miss, int type, int *obs_i
 void make_bins(struct Genotype *geno, Gmat *M, Bin *bin);
 void make_bins_fix(Gmat *M, Bin *bin);
 void make_bins_LD(Gmat *M, Bin *bin);
-void one_phe_to_multi(double *vec, int npop, int *npops, double miss, double *multi, int type);
+void one_col_to_multi(double* vec, int npop, int* npops, double miss, double* multi, int type);
 void single_phe(struct Pheno *phe, struct Model *model, double miss);
 void load_phenotype(struct Pheno *pheno, struct Model *model, char *phe_pos, double miss);
 void multi_phe_to_vec(struct Pheno *phe, struct Model *model, double miss);
+void single_phe_to_vec(struct Pheno *phe, struct Model *model, double miss);
 void left_right_hand_update(struct Model* model, int iter);
 // void fix_sample(double *Lhs, double *Rhs, double *theta, int n, VSLStreamStatePtr stream);
 void fix_sample(struct Model* model, VSLStreamStatePtr stream);
@@ -349,3 +351,4 @@ void remove_individual(Gmat *M, int popi, int location);
 void remove_SNP(Gmat *M, int chri, int location);
 void compute_r2(Gmat *M, int chr, int start, int nmrk, int win, double *mean);
 void read_allele(char *to, char *from);
+void fid_order(Gmat *M);

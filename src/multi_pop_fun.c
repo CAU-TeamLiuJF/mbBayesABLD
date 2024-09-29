@@ -825,6 +825,7 @@ void make_bins_LD(Gmat* M, Bin* bin)
   }
 
   printf("Under development\n");
+  exit(UNDER_DEVELOP);
 
   bin->nsnps = (double*)calloc(bini, sizeof(double));
   for (size_t i = 0; i < bini; i++) {
@@ -875,12 +876,11 @@ void make_bins(struct Genotype* geno, Gmat* M, Bin* bin)
  * @param  multi            output phenotypes, mat
  * @param  type             stored type of output phenotypes, mat/vec
  */
-void one_phe_to_multi(double* vec, int npop, int* npops, double miss, double* multi, int type)
+void one_col_to_multi(double* vec, int npop, int* npops, double miss, double* multi, int type)
 {
   int nind = sumi(npops, npop, 1);
   int indi = 0;
   int index;
-  // double* multi = (double*)calloc(nind * npop, sizeof(double));
   // save phenotypes
 
   // number of individula with phenotype
@@ -905,6 +905,50 @@ void one_phe_to_multi(double* vec, int npop, int* npops, double miss, double* mu
       }
 
       multi[index] = vec[j + indi];
+    }
+  }
+}
+
+/**
+ * @brief Change the single column phenotypic values to be stored in multiple traits form
+ * @param  y                input phenotypic values (nind x 1)
+ * @param  npop             number of breeds
+ * @param  npops            number of individuals in each breeds
+ * @param  miss             missing value
+ * @param  type             stored type of output phenotypes, mat/vec
+ */
+void one_phe_to_multi_new(double* y, int npop, int* npops, double miss, int type)
+{
+  int nind = sumi(npops, npop, 1);
+  int indi = 0;
+  int index;
+
+  /*  */
+  double *y1c = (double*)calloc(nind, sizeof(double));
+  copy_d(y1c, 1, y, 1, nind, 1);
+
+  /*  */
+  y = realloc(y, nind * npop * sizeof(double));
+
+  // impute missing values
+  fill_d(miss, y, nind * npop, 1);
+
+  // fill
+  for (size_t i = 0; i < npop; i++) {
+    indi = sumi(npops, i, 1);
+    for (size_t j = 0; j < npops[i]; j++) {
+      if (type == 1) {
+        index = (j + indi) * npop + i;
+      }
+      else if (type == 0) {
+        index = j + indi + i * nind;
+      }
+      else {
+        printf("Error: type should be mat or vec");
+        exit(ERROR_PARA);
+      }
+
+      y[index] = y1c[j + indi];
     }
   }
 }
@@ -1214,11 +1258,16 @@ void load_phenotype(struct Pheno* pheno, struct Model* model, char* phe_pos, dou
   /* Location of phenotypic information in the file */
   if (strlen(phe_pos) == 0) {
     // By default, the last n columns of the phenotype file are phenotype
-    pheno->triCols = (int*)calloc(model->npop, sizeof(int));
-    for (size_t i = 0; i < model->npop; i++) {
-      pheno->triCols[i] = pheno->cols - model->npop + i + 1;
-    }
-    pheno->ntriCol = model->npop;
+    // pheno->triCols = (int*)calloc(model->npop, sizeof(int));
+    // for (size_t i = 0; i < model->npop; i++) {
+    //   pheno->triCols[i] = pheno->cols - model->npop + i + 1;
+    // }
+    // pheno->ntriCol = model->npop;
+
+    // By default, the last 1 columns of the phenotype file are phenotype
+    pheno->triCols = (int*)calloc(1, sizeof(int));
+    pheno->triCols[0] = pheno->cols;
+    pheno->ntriCol = 1;
   }
   else {
     pheno->triCols = string_to_array(phe_pos, &pheno->ntriCol, " ");
@@ -1230,9 +1279,7 @@ void load_phenotype(struct Pheno* pheno, struct Model* model, char* phe_pos, dou
   read_dataframe_double(pheno->filename, pheno->rows, pheno->cols, pheno->y, pheno->ntriCol, pheno->triCols, -1);
   if (model->npop > 1) {
     if (pheno->ntriCol == 1) {
-      // model.nind = count(pheno->rows, pheno->y, para.miss, 0);
-      // one_phe_to_multi(pheno->y, model->npop, model->npops, miss, model->yc, model->type); old
-      one_phe_to_multi(pheno->y, model->npop, model->npops, miss, model->yc, pheno->type);
+      single_phe_to_vec(pheno, model, miss);
     }
     else if (pheno->ntriCol == model->npop) {
       multi_phe_to_vec(pheno, model, miss);
@@ -1268,18 +1315,17 @@ void load_phenotype(struct Pheno* pheno, struct Model* model, char* phe_pos, dou
  */
 void multi_phe_to_vec(struct Pheno* phe, struct Model* model, double miss)
 {
-  int ind_start = 0;
-  int row;
   double value;
   int nind_phe = 0;
+
   double* y = (double*)calloc(phe->rows, sizeof(double));
   model->npops = (int*)calloc(model->npop, sizeof(int));
+
   for (size_t i = 0; i < model->npop; i++) {
     for (size_t j = 0; j < phe->rows; j++) {
-      row = ind_start + j;
-      value = phe->y[row * model->npop + i];
+      value = phe->y[j * model->npop + i];
       if (value > miss) {
-        phe->pheID[nind_phe] = phe->ID[row];
+        phe->pheID[nind_phe] = phe->ID[j];
         y[nind_phe] = value;
         nind_phe++;
         model->npops[i]++;
@@ -1294,7 +1340,55 @@ void multi_phe_to_vec(struct Pheno* phe, struct Model* model, double miss)
 
   // phenotype vector
   model->yc = (double*)calloc(model->npop * nind_phe, sizeof(double));
-  one_phe_to_multi(y, model->npop, model->npops, miss, model->yc, phe->type);
+  one_col_to_multi(y, model->npop, model->npops, miss, model->yc, phe->type);
+
+  free(y);
+}
+
+/**
+ * @brief
+ * @param phe
+ * @param model
+ * @param geno
+ * @param miss
+ */
+void single_phe_to_vec(struct Pheno *phe, struct Model *model, double miss)
+{
+  Gmat gmat = model->geno->Ma;
+  double value;
+  int nind_phe = 0;
+
+  double* y = (double*)calloc(phe->rows, sizeof(double));
+  model->npops = (int*)calloc(model->npop, sizeof(int));
+
+  /* number of individuals */
+  if (gmat.nind != phe->rows) {
+    printf("Error: The number of individuals in genotype files and phenotype files is not equal.\n");
+    exit(ERROR_INPUT);
+  }
+
+  int ind_idx = 0;
+  for (size_t i = 0; i < model->npop; i++) {
+    for (size_t j = 0; j < gmat.ninds[i]; j++) {
+      value = phe->y[ind_idx];
+      if (value > miss) {
+        phe->pheID[nind_phe] = phe->ID[j];
+        y[nind_phe] = value;
+        nind_phe++;
+        model->npops[i]++;
+      }
+      ind_idx++;
+    }
+  }
+  phe->nindPhe = nind_phe;
+
+  // index of individuals with phenotype
+  phe->pheIDInx = (int*)calloc(phe->rows, sizeof(int));
+  char_match(phe->nindPhe, phe->pheID, phe->rows, phe->ID, phe->pheIDInx);
+
+  // phenotype vector
+  model->yc = (double*)calloc(model->npop * nind_phe, sizeof(double));
+  one_col_to_multi(y, model->npop, model->npops, miss, model->yc, phe->type);
 
   free(y);
 }
@@ -2041,4 +2135,23 @@ void read_allele(char* to, char* from)
   }
 
   to[0] = from[0];
+}
+
+void fid_order(Gmat *M)
+{
+  int fid_rank;
+  int last_fid_rank = 0;
+  for (size_t i = 0; i < M->nind; i++)
+  {
+    fid_rank = in_char(M->fam[i].fid, M->fids, M->npop);
+
+    if (fid_rank < 0) {
+      printf("Error: unknown error occurred while checking the sorting of variety identifiers.\n");
+      exit(ERROR_PARA);
+    } else if (fid_rank < last_fid_rank) {
+      printf("Error: Individuals in genotype files need to be sorted according to breed identifiers.\n");
+      exit(ERROR_PARA);
+    }
+    last_fid_rank = fid_rank;
+  }
 }

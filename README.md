@@ -4,7 +4,7 @@
  * @FilePath: \mbBayesABLD\Readme.md
 -->
 
-[User Manual](#user-manual)
+# User Manual
 
 - [1. Software Introduction](#1-software-introduction)
 - [2. Installation Instructions](#2-installation-instructions)
@@ -33,6 +33,8 @@ User Manual for Multi-Breed Joint Prediction Models that Accounting for Heteroge
 
 This tool enables the calculation of genomic estimated breeding values (GEBVs) for all individuals based on their phenotypic and genotypic data. It provides the ability to effectively leverage information from multiple breeds, significantly enhancing breeding selection efficiency and the overall productivity of the industry.
 
+ [back to top](#user-manual)
+
 ## 2. Installation Instructions
 
 The program was developed on the `CentOS Linux release 7.9.2003` platform and is based on Linux version `3.10.0-1127.19.1.el7.x86_64` kernel version. It should be able to run on any Unix-like system.
@@ -42,6 +44,8 @@ Considering that the program is mainly developed in C language, it should also b
 This software is designed for genomic prediction and requires input in the form of phenotypic records and genotypic information of the analyzed individuals (typically in the form of SNP arrays). Additionally, due to matrix storage and computational processes, extra storage demands may arise during analysis. We recommend that the computer running the software has at least 10GB of available memory. For larger populations, more system memory will be required depending on the population size.
 
 This software relies on the `Intel® oneAPI Math Kernel Library` for scientific calculations (no version requirement). Users need to ensure the existence of this dependencies in their runtime environment. 
+
+[back to top](#user-manual)
 
 ## 3. Quick Start
 
@@ -166,6 +170,8 @@ The specific details of each parameter are as follows:
     - `-H, --header`: Specify if input files have headers
       - If present, automatically detects headers in the phenotype and bins files.
     
+
+[back to top](#user-manual)
 
 ## 4. File Description
 
@@ -396,6 +402,8 @@ MCMC finished.
 Run ended at Sun Dec  3 14:34:09 2023
 ```
 
+[back to top](#user-manual)
+
 ## 5. Example Code
 
 Sample datasets can be found in the `example` folder.
@@ -480,7 +488,7 @@ MCMC finished.
 Run ended at Sun Sep 29 11:54:40 2024
 ```
 
-
+[back to top](#user-manual)
 
 **Note:**
 This software is made available solely for the purpose of reproducing the results presented in the scientific article titled _Enhancing Multi-Breed Genomic Prediction for Small-Scale Breeds by Modeling Heterogeneous Genetic (Co)Variance Blockwise Accounting for Linkage Disequilibrium_. Any other use of this software, including commercial or non-research applications, is strictly prohibited without prior permission. For inquiries or permission requests, please contact the author at: liujf@cau.edu.cn.
